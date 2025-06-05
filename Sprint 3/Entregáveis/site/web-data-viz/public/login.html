@@ -171,93 +171,47 @@
 <script>
 
   const listaSalas = [];
+function entrar() {
+  const email = input_email.value;
+  const senha = input_senha.value;
 
-  function entrar() {
-    aguardar();
-
-    // var cnpjVar = cnpj_input.value;
-    var emailVar = email_input.value;
-    var senhaVar = senha_input.value;
-
-    if (/*cnpjVar == "" ||*/ emailVar == "" || senhaVar == "") {
-      cardErro.style.display = "block"
-      mensagem_erro.innerHTML = `É necessário preencher todos os campos!`;
-      finalizarAguardar();
-      return false;
-
-    } else if (emailVar.indexOf(`@`) <= 0 || !emailVar.endsWith(`.com`)) { /*----------------------------EMAIL----------------------------*/
-      cardErro.style.display = "block";
-      mensagem_erro.innerHTML = `É necessário inserir e-mail valido!`;
-      finalizarAguardar();
-      return false;
-
-    } else if (senhaVar.indexOf("abc") !== -1 || /*----------------------------SENHA----------------------------*/
-      senhaVar.indexOf("123") !== -1 ||
-      senhaVar.indexOf("senha") !== -1 ||
-      senhaVar.length < 8 || senhaVar.indexOf(" ") !== -1) {
-
-      cardErro.style.display = "block"
-      mensagem_erro.innerHTML = `Senha não pode conter sequências óbvias, espaços e use no mínimo 8 caracteres`;
-      finalizarAguardar();
-      return false;
-
-    } else {
-      setInterval(sumirMensagem, 5000)
-    }
-
-    // console.log("FORM LOGIN: ", cnpjVar);
-    console.log("FORM LOGIN: ", emailVar);
-    console.log("FORM SENHA: ", senhaVar);
-
-    fetch("/usuarios/autenticar", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        // cnpjServer: cnpjVar,
-        emailServer: emailVar,
-        senhaServer: senhaVar
-        
-      }),
-    }).then(function (resposta) {
-      console.log("ESTOU NO THEN DO entrar()!");
-
-      if (resposta.ok) {
-        console.log(resposta);
-
-        resposta.json().then(json => {
-          console.log(json);
-          console.log(JSON.stringify(json));
-          sessionStorage.ID_USUARIO = json.idFuncionario;
-          sessionStorage.NOME_USUARIO = json.nome;
-          sessionStorage.EMAIL_USUARIO = json.email;
-          sessionStorage.fkHospital = json.fkHospital;
-          // localStorage.setItem ("fkHospital",json.fkHospital);
-
-
-          setTimeout(function () {
-            window.location = "./dashboard/setores.html";
-          }, 1000); // apenas para exibir o loading
-
-        });
-
-      } else {
-
-        console.log("Houve um erro ao tentar realizar o login!");
-
-        resposta.text().then(texto => {
-          console.error(texto);
-          finalizarAguardar(texto);
-        });
-      }
-
-    }).catch(function (erro) {
-      console.log(erro);
-    })
-
-    return false;
+  if (!email || !senha) {
+    alert("Preencha todos os campos!");
+    return;
   }
+
+  fetch("/usuarios/autenticar", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      emailServer: email,
+      senhaServer: senha
+    })
+  })
+    .then(res => {
+      if (res.ok) return res.json();
+      else throw new Error("Login inválido");
+    })
+    .then(resposta => {
+      console.log("Login bem-sucedido:", resposta);
+
+      // ✅ SALVANDO NO SESSIONSTORAGE:
+      sessionStorage.ID_USUARIO = resposta.idFuncionario;
+      sessionStorage.EMAIL_USUARIO = resposta.email;
+      sessionStorage.NOME_USUARIO = resposta.nome;
+      sessionStorage.SENHA_USUARIO = resposta.senha; // só se for necessário
+      sessionStorage.HOSPITAL = resposta.fkHospital;
+
+      window.location.href = "setores.html";
+    })
+    .catch(erro => {
+      console.error("Erro no login:", erro.message);
+      alert("Email ou senha inválidos");
+    });
+}
+
 
 
   function sumirMensagem() {
