@@ -11,4 +11,7 @@ router.post("/cadastrar", function (req, res) {
   salaController.cadastrar(req, res);
 })
 
+router.post("/por-setor", salaController.listarSalasPorSetor);
+
+
 module.exports = router;

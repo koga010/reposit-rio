@@ -24,6 +24,30 @@ function buscarSalasPorHospital(req, res) {
   }
 }
 
+function listarSalasPorSetor(req, res) {
+  var email = req.body.emailServer;
+  var senha = req.body.senhaServer;
+  var nomeSetor = req.body.nomeSetor;
+
+  if (!email || !senha || !nomeSetor) {
+    res.status(400).send("Dados incompletos para busca.");
+  } else {
+    salaModel.listarSalasPorSetor(email, senha, nomeSetor)
+      .then(resultado => {
+        if (resultado.length > 0) {
+          res.status(200).json(resultado);
+        } else {
+          res.status(204).send();
+        }
+      })
+      .catch(erro => {
+        console.error("Erro ao buscar salas por setor:", erro.sqlMessage);
+        res.status(500).json(erro.sqlMessage);
+      });
+  }
+}
+
+
 function cadastrar(req, res) {
   var setor = req.body.setor;
   var nome = req.body.nome;
@@ -52,27 +76,6 @@ function cadastrar(req, res) {
       });
   }
 }
-
-
-function listarSalasPorSetor(req, res) {
-
-    var email = req.body.emailServer;
-    var senha = req.body.senhaServer;
-    var nomeSetor = sessionStorage.SALAS
-
-    salaModel.listarSalasPorSetor(email, senha, nomeSetor).then((resultado) => {
-      if (resultado.length > 0) {
-        res.status(200).json(resultado);
-      } else {
-        res.status(204).json([]);
-      }
-    }).catch(function (erro) {
-      console.log(erro);
-      console.log("Houve um erro ao buscar as salas: ", erro.sqlMessage);
-      res.status(500).json(erro.sqlMessage);
-    });
-  }
-
 
 
 

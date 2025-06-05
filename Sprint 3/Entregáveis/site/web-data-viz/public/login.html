@@ -218,6 +218,7 @@
         // cnpjServer: cnpjVar,
         emailServer: emailVar,
         senhaServer: senhaVar
+        
       }),
     }).then(function (resposta) {
       console.log("ESTOU NO THEN DO entrar()!");
@@ -231,7 +232,9 @@
           sessionStorage.ID_USUARIO = json.idFuncionario;
           sessionStorage.NOME_USUARIO = json.nome;
           sessionStorage.EMAIL_USUARIO = json.email;
-          sessionStorage.SALAS = JSON.stringify(json.salas)
+          sessionStorage.fkHospital = json.fkHospital;
+          // localStorage.setItem ("fkHospital",json.fkHospital);
+
 
           setTimeout(function () {
             window.location = "./dashboard/setores.html";
@@ -256,37 +259,6 @@
     return false;
   }
 
-  // function listar() {
-  //   var emailVar = email_input.value;
-  //   var senhaVar = senha_input.value;
-
-  //   fetch("/sala/buscarSalasPorHopital", {
-  //     method: "POST",
-  //     headers: {
-  //       "Content-Type": "application/json"
-  //     },
-  //     body: JSON.stringify({
-  //       emailServer: emailVar,
-  //       senhaServer: senhaVar
-  //     }),
-  //   }).then(function (resposta) {
-  //     console.log("ENTREI NA LISTAGEM DAS SALAS", resposta)
-
-  //     if (resposta.ok) {
-  //       return resposta.json().then(function (listaSalas) {
-  //         for (let i = 0; i < listaSalas.length; i++) {
-  //           listaSalas.push(sala);
-  //           console.log('id sala');
-  //           console.log(listaSalas[i].idSala);
-  //         }
-  //       })
-  //         .cath(function (resposta) {
-  //           console.log(`#ERRO: ${resposta}`)
-  //         })
-  //     }
-  //   }
-  //   )
-  // }
 
   function sumirMensagem() {
     cardErro.style.display = "none"

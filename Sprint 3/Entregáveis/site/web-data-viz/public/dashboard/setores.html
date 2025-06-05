@@ -18,8 +18,11 @@
 
     <link rel="icon" href="../assets/favicon.ico" type="image/x-icon">
 </head>
-<body style="background-color: white;" onload="validarSessao(), exibirSalas()">
- 
+
+<!-- <body style="background-color: white;" onload="validarSessao(), exibirSetores()"> -->
+
+<body style="background-color: white;" onload="validarSessao(); carregarSetores()">
+
     <!----------------------------------------------------------- MENU DE NAVEGAÇÃO  ------------->
 
     <nav class="menu">
@@ -150,28 +153,120 @@
 </html>
 <script>
 
-    function exibirSalas() {
+    function carregarSetores() {
+        console.log("EMAIL:", sessionStorage.EMAIL_USUARIO);
+        console.log("SENHA:", sessionStorage.SENHA_USUARIO);
 
-        
-        JSON.parse(sessionStorage.SALAS).forEach(item => {
-            document.getElementById("cardSala").innerHTML += `
-                    <div class="setores-caixa" onclick="irParaSetor(${item.idSala})">
-                        <div class="caixa-texto">
-                            <h2>${item.setor}</h2>
-                        </div>
-                        <div class="caixa-status">
-                            <h1>${item.nome}</h1>
-                        </div>
-                    </div>`
+        const email = sessionStorage.EMAIL_USUARIO;
+        const senha = sessionStorage.SENHA_USUARIO;
+
+        if (!email || !senha) {
+            console.error("Usuário não está logado!");
+            return;
         }
-    );
-        // alert(JSON.parse(sessionStorage.SALAS).forEach(item => {item.nome}));
 
+
+        if (!email || !senha) {
+            console.error("Usuário não está logado!");
+            return;
+        }
+
+        fetch("/setor/buscar", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                emailServer: email,
+                senhaServer: senha
+            })
+        })
+            .then(res => {
+                if (res.ok) return res.json();
+                else throw new Error("Erro ao buscar setores.");
+            })
+            .then(setores => {
+                if (setores.length > 0) {
+                    exibirSetores(setores);
+                } else {
+                    document.getElementById("cardSala").innerHTML = "<p>Nenhum setor encontrado.</p>";
+                }
+            })
+            .catch(erro => {
+                console.error("Erro ao buscar setores:", erro.message);
+            });
+    }
+
+
+    function buscarSetores(email, senha) {
+        fetch("/setor/buscar", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                emailServer: email,
+                senhaServer: senha
+            })
+        })
+            .then(res => {
+                if (res.ok) return res.json();
+                else throw new Error("Erro ao buscar setores.");
+            })
+            .then(setores => {
+                console.log("Setores encontrados:", setores);
+            })
+            .catch(erro => {
+                console.error("Erro ao buscar setores:", erro.message);
+            });
+    }
+
+
+    function exibirSetores(listaSetores) {
+        const cardSala = document.getElementById("cardSala");
+        cardSala.innerHTML = ""; // Limpar antes de inserir
+
+        listaSetores.forEach(item => {
+            cardSala.innerHTML += `
+      <div class="setores-caixa" onclick="irParaSetor(${item.idSetor})">
+        <div class="caixa-texto">
+          <h2>${item.nome}</h2>
+        </div>
+        <div class="caixa-status">
+          <h1>${item.nome}</h1>
+        </div>
+      </div>`;
+        });
     }
 
     function irParaSetor(idSala) {
         console.log('Fui para a transferência', idSala);
         window.location.href = `dashboard-atual.html?idSala=${idSala}`;
     }
+
+    function listarSalasPorSetor(email, senha, nomeSetor) {
+        fetch("/sala/por-setor", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                emailServer: email,
+                senhaServer: senha,
+                nomeSetor: nomeSetor
+            })
+        })
+            .then(res => {
+                if (res.ok) return res.json();
+                else throw new Error("Erro ao buscar salas por setor.");
+            })
+            .then(salas => {
+                console.log("Salas no setor:", salas);
+            })
+            .catch(erro => {
+                console.error("Erro ao buscar salas por setor:", erro.message);
+            });
+    }
+
 
 </script>

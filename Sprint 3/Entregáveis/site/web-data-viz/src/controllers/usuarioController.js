@@ -27,14 +27,15 @@ function autenticar(req, res) {
 
 
 
-                        
-                            res.json({
-                                idFuncionario: resultadoAutenticar[0].idFuncionario,
-                                email: resultadoAutenticar[0].email,
-                                nome: resultadoAutenticar[0].nome,
-                                senha: resultadoAutenticar[0].senha
-                            });
-                        
+
+                        res.json({
+                            idFuncionario: resultadoAutenticar[0].idFuncionario,
+                            email: resultadoAutenticar[0].email,
+                            nome: resultadoAutenticar[0].nome,
+                            senha: resultadoAutenticar[0].senha,
+                            fkHospital: resultadoAutenticar[0].fkHospital
+                        });
+
 
                     } else if (resultadoAutenticar.length == 0) {
                         res.status(403).send("Email e/ou senha inválido(s)");
