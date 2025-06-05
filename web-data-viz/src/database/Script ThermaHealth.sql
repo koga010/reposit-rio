@@ -2,7 +2,7 @@
 CREATE DATABASE IF NOT EXISTS thermaHealth;
 USE thermaHealth;
 
- DROP database thermaHealth;
+ -- DROP database thermaHealth;
 
 
 -- Criação da tabela de hospitais
@@ -25,6 +25,7 @@ CREATE TABLE IF NOT EXISTS hospital(
 	cnpj CHAR(8) NOT NULL,
 	digitoVerifica CHAR(2) NOT NULL,
 	razaoSocial VARCHAR(200) NOT NULL,
+    
     constraint fkHospitalEndereco 
 		foreign key (fkEndereco) references endereco(idEndereco)
 );
@@ -44,22 +45,16 @@ CREATE TABLE IF NOT EXISTS funcionario(
 			references hospital(idHospital)
 );
 
-create table setor(
-idSetor int primary key auto_increment,
-nome varchar (45),
-fkHospital int,
-foreign key (fkHospital) references hospital(idHospital));
-
--- insert into setor ()
-
 -- Criação da tabela de salas hospitalares, ligadas a hospitais
 CREATE TABLE IF NOT EXISTS sala(
 	idSala INT PRIMARY KEY AUTO_INCREMENT,
-	fkSetor int NOT NULL,
-    foreign key (fkSetor) references setor(idSetor), 
+	setor VARCHAR(45) NOT NULL, 
 	nome VARCHAR(45) NOT NULL,
 	descricao TEXT NOT NULL,
-	andar TINYINT NOT NULL
+	andar TINYINT NOT NULL,  
+	fkHospital INT NOT NULL,
+		constraint fkSalaHospital foreign key (fkHospital)
+			references hospital(idHospital)
 );
 
 -- Criação da tabela de parâmetros ideais para sensores
@@ -152,19 +147,14 @@ INSERT INTO funcionario (matricula, nome, senha, nivelAcesso, email, fkSuperviso
 ('000004', 'Fernanda Rocha', 'e10adc3949ba59abbe56e057f20f883e', 'S', 'fernanda.rocha@hospital.com', 1, 2),
 ('000005', 'Bruno Martins', 'e10adc3949ba59abbe56e057f20f883e', 'C', 'bruno.martins@hospital.com', 4, 2);
 
-insert into setor(nome, fkHospital) values
-("Emergencial",1),("Radiologia",1),("Pediatria",1),("UTI",1),("Centro Cirurgico",1),("Administração",1);
-
-select * from setor;
-
 -- Inserção de salas hospitalares com diferentes setores e hospitais
-INSERT INTO sala (fkSetor, nome, descricao, andar) VALUES
-(1, 'Sala de Atendimento 1', 'Sala equipada para primeiros socorros e emergências médicas.', 1),
-(4, 'UTI Geral', 'Unidade de Terapia Intensiva para pacientes críticos.', 2),
-(3, 'Sala de Brinquedos', 'Espaço lúdico para crianças internadas.', 1),
-(2, 'Sala de Raio-X', 'Sala equipada com aparelho de raio-x digital.', 1),
-(5,'Sala de Cirurgia 2', 'Sala para procedimentos cirúrgicos de médio porte.', 2),
-(6,'Sala da Diretoria', 'Sala administrativa da diretoria do hospital.', 3);
+INSERT INTO sala (setor, nome, descricao, andar, fkHospital) VALUES
+('Emergência', 'Sala de Atendimento 1', 'Sala equipada para primeiros socorros e emergências médicas.', 1, 1),
+('UTI', 'UTI Geral', 'Unidade de Terapia Intensiva para pacientes críticos.', 2, 1),
+('Pediatria', 'Sala de Brinquedos', 'Espaço lúdico para crianças internadas.', 1, 2),
+('Radiologia', 'Sala de Raio-X', 'Sala equipada com aparelho de raio-x digital.', 1, 1),
+('Centro Cirúrgico', 'Sala de Cirurgia 2', 'Sala para procedimentos cirúrgicos de médio porte.', 2, 2),
+('Administração', 'Sala da Diretoria', 'Sala administrativa da diretoria do hospital.', 3, 1);
 
 -- Inserção de parâmetros ideais de sensores
 INSERT INTO parametrosIdeais (idParametros, fkSala, temperatura_min, temperatura_max, umidade_min, umidade_max) VALUES
@@ -462,13 +452,8 @@ create view vw_acesso as
 
 
            
-SELECT * FROM sala; 
+SELECT * FROM sala;
+SELECT * FROM registro;
+SELECT * FROM registroAlerta;
+SELECT * FROM alerta;
 
-select concat(cnpj, sufixo, digitoVerifica) from hospital;
-select * from funcionario;
-select * from setor;
-select * from setor s join hospital h on h.idHospital=s.fkHospital where idHospital = 1;
-select * from sala join setor s on fkSetor=s.idSetor;
-
-SELECT s.* FROM setor s JOIN funcionario f ON f.fkHospital = s.fkHospital 
-    join hospital h on s.fkHospital=h.idHospital;

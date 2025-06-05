@@ -2,7 +2,7 @@
 CREATE DATABASE IF NOT EXISTS thermaHealth;
 USE thermaHealth;
 
- DROP database thermaHealth;
+ -- DROP database thermaHealth;
 
 
 -- Criação da tabela de hospitais
